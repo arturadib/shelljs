@@ -86,6 +86,10 @@ function _sed(options, regex, replacement, files) {
     }
   });
 
-  return sed.join('\n');
+  if (options.inplace) {
+    return '';
+  } else {
+    return sed.join('\n');
+  }
 }
 module.exports = _sed;

@@ -94,7 +94,7 @@ test('-i option', t => {
   const result = shell.sed('-i', /test1/, 'hello', `${t.context.tmp}/file1`);
   t.falsy(shell.error());
   t.is(result.code, 0);
-  t.is(result.toString(), 'hello');
+  t.is(result.toString(), '');
   t.is(shell.cat(`${t.context.tmp}/file1`).toString(), 'hello');
 });
 
@@ -159,7 +159,7 @@ test('multiple file names, with in-place-replacement', t => {
     `${t.context.tmp}/file2`]);
   t.falsy(shell.error());
   t.is(result.code, 0);
-  t.is(result.toString(), 'hello1\nhello2');
+  t.is(result.toString(), '');
   t.is(shell.cat(`${t.context.tmp}/file1`).toString(), 'hello1');
   t.is(shell.cat(`${t.context.tmp}/file2`).toString(), 'hello2');
 });
@@ -170,7 +170,7 @@ test('glob file names, with in-place-replacement', t => {
   const result = shell.sed('-i', 'test', 'hello', `${t.context.tmp}/file*.txt`);
   t.falsy(shell.error());
   t.is(result.code, 0);
-  t.is(result.toString(), 'hello1\n\nhello2\n'); // TODO: fix sed's behavior
+  t.is(result.toString(), '');
   t.is(shell.cat(`${t.context.tmp}/file1.txt`).toString(), 'hello1\n');
   t.is(shell.cat(`${t.context.tmp}/file2.txt`).toString(), 'hello2\n');
 });
