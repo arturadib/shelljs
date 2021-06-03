@@ -32,11 +32,19 @@ function _tail(options, files) {
   if (!files && !pipe) common.error('no paths given');
 
   var idx = 1;
+  var plusOption = false;
   if (options.numLines === true) {
     idx = 2;
+    if (arguments[1][0] === '+') {
+      plusOption = true;
+    }
     options.numLines = Number(arguments[1]);
   } else if (options.numLines === false) {
     options.numLines = 10;
+  }
+  // arguments[0] is a json object
+  if (arguments[0].numLines[0] === '+') {
+    plusOption = true;
   }
   options.numLines = -1 * Math.abs(options.numLines);
   files = [].slice.call(arguments, idx);
@@ -69,12 +77,14 @@ function _tail(options, files) {
       shouldAppendNewline = false;
     }
 
-    tail = tail.concat(lines.slice(options.numLines));
+    tail = tail.concat(plusOption ? lines.slice(-options.numLines - 1) : lines.slice(options.numLines));
   });
 
   if (shouldAppendNewline) {
     tail.push(''); // to add a trailing newline once we join
   }
+
   return tail.join('\n');
 }
+
 module.exports = _tail;

@@ -90,7 +90,7 @@ test('reading more lines than are in the file (with trailing newline)', t => {
   t.is(result.toString(), 'short2\nshort1\n'); // these files only have one line (with \n)
 });
 
-test('Globbed file', t => {
+test('globbed file', t => {
   const result = shell.tail('test/resources/head/file?.txt');
   t.falsy(shell.error());
   t.is(result.code, 0);
@@ -102,7 +102,7 @@ test('Globbed file', t => {
       .join('\n') + '\n');
 });
 
-test('With `\'-n\' <num>` option', t => {
+test('with `\'-n\' <num>` option', t => {
   const result = shell.tail('-n', 4, 'test/resources/head/file2.txt',
     'test/resources/head/file1.txt');
   t.falsy(shell.error());
@@ -115,7 +115,20 @@ test('With `\'-n\' <num>` option', t => {
       .join('\n') + '\n');
 });
 
-test('With `{\'-n\': <num>}` option', t => {
+test('with `\'-n\' +<num>` option', t => {
+  const result = shell.tail('-n', '+48', 'test/resources/head/file2.txt',
+    'test/resources/head/file1.txt');
+  t.falsy(shell.error());
+  t.is(result.code, 0);
+  t.is(result.toString(),
+    bottomOfFile2
+      .slice(0, 3)
+      .reverse()
+      .concat(bottomOfFile1.slice(0, 3).reverse())
+      .join('\n') + '\n');
+});
+
+test('with `{\'-n\': <num>}` option', t => {
   const result = shell.tail({ '-n': 4 }, 'test/resources/head/file2.txt',
     'test/resources/head/file1.txt');
   t.falsy(shell.error());
@@ -125,6 +138,19 @@ test('With `{\'-n\': <num>}` option', t => {
       .slice(0, 4)
       .reverse()
       .concat(bottomOfFile1.slice(0, 4).reverse())
+      .join('\n') + '\n');
+});
+
+test('with `{\'-n\': +<num>}` option', t => {
+  const result = shell.tail({ '-n': '+48' }, 'test/resources/head/file2.txt',
+    'test/resources/head/file1.txt');
+  t.falsy(shell.error());
+  t.is(result.code, 0);
+  t.is(result.toString(),
+    bottomOfFile2
+      .slice(0, 3)
+      .reverse()
+      .concat(bottomOfFile1.slice(0, 3).reverse())
       .join('\n') + '\n');
 });
 
