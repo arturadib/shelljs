@@ -165,3 +165,37 @@ test('Cannot overwrite an existing command', t => {
   }, 'Command `cat` already exists');
   t.is(shell.cat, oldCat);
 });
+
+test('Deprecated command', t => {
+  process.throwDeprecation = true;
+  const oldThrowDep = process.throwDeprecation;
+  try {
+    plugin.register('dep', function dep(opt, arg) { return arg; }, {
+      cmdOptions: null,
+      deprecated: 'Use the foo method instead',
+    });
+
+    t.throws(() => {
+      shell.dep('bar');
+    }, /Use the foo method instead/);
+  } finally {
+    process.throwDeprecation = oldThrowDep;
+  }
+});
+
+test('Deprecated command in pipe', t => {
+  process.throwDeprecation = true;
+  plugin.register('depPipe', function depPipe(opt, arg) { return arg; }, {
+    cmdOptions: null,
+    deprecated: 'Use the foo pipe instead',
+    canReceivePipe: true,
+  });
+  const oldThrowDep = process.throwDeprecation;
+  try {
+    t.throws(() => {
+      shell.cat('./package.json').depPipe('bar');
+    }, /Use the foo pipe instead/);
+  } finally {
+    process.throwDeprecation = oldThrowDep;
+  }
+});

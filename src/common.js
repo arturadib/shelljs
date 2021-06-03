@@ -6,6 +6,7 @@
 
 var os = require('os');
 var fs = require('fs');
+var util = require('util');
 var glob = require('glob');
 var shell = require('..');
 
@@ -339,7 +340,7 @@ exports.randomFileName = randomFileName;
 // command-logging, and other nice things
 function wrap(cmd, fn, options) {
   options = options || {};
-  return function () {
+  var fun = function () {
     var retValue = null;
 
     state.currentCmd = cmd;
@@ -436,6 +437,11 @@ function wrap(cmd, fn, options) {
     state.currentCmd = 'shell.js';
     return retValue;
   };
+  if (options.deprecated) {
+    var msg = options.deprecated; // This is the deprecation message.
+    fun = util.deprecate(fun, msg);
+  }
+  return fun;
 } // wrap
 exports.wrap = wrap;
 
@@ -455,6 +461,7 @@ var DEFAULT_WRAP_OPTIONS = {
   pipeOnly: false,
   wrapOutput: true,
   unix: true,
+  deprecated: '',
 };
 
 // This is populated during plugin registration
