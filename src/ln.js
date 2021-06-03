@@ -37,7 +37,19 @@ function _ln(options, source, dest) {
   var isAbsolute = (path.resolve(source) === sourcePath);
   dest = path.resolve(process.cwd(), String(dest));
 
-  if (fs.existsSync(dest)) {
+  if (fs.existsSync(dest) && common.statFollowLinks(dest).isDirectory()) {
+    dest = path.join(dest, path.basename(sourcePath));
+  }
+
+  var destinationExists;
+  try {
+    fs.lstatSync(dest);
+    destinationExists = true;
+  } catch (err) {
+    destinationExists = false;
+  }
+
+  if (destinationExists) {
     if (!options.force) {
       common.error('Destination file exists', { continue: true });
     }
@@ -49,7 +61,16 @@ function _ln(options, source, dest) {
     var isWindows = process.platform === 'win32';
     var linkType = isWindows ? 'file' : null;
     var resolvedSourcePath = isAbsolute ? sourcePath : path.resolve(process.cwd(), path.dirname(dest), source);
-    if (!fs.existsSync(resolvedSourcePath)) {
+
+    var resolvedSourceExists;
+    try {
+      fs.lstatSync(resolvedSourcePath);
+      resolvedSourceExists = true;
+    } catch (err) {
+      resolvedSourceExists = false;
+    }
+
+    if (!resolvedSourceExists) {
       common.error('Source file does not exist', { continue: true });
     } else if (isWindows && common.statFollowLinks(resolvedSourcePath).isDirectory()) {
       linkType = 'junction';

@@ -16,6 +16,7 @@ test.beforeEach(t => {
 });
 
 test.afterEach.always(t => {
+  process.chdir(CWD);
   shell.rm('-rf', t.context.tmp);
 });
 
@@ -44,6 +45,13 @@ test('only an option', t => {
 
 test('destination already exists', t => {
   const result = shell.ln(`${t.context.tmp}/file1`, `${t.context.tmp}/file2`);
+  t.truthy(shell.error());
+  t.is(result.code, 1);
+});
+
+test('destination already exists inside directory', t => {
+  shell.cd(t.context.tmp);
+  const result = shell.ln('-s', 'file1', './');
   t.truthy(shell.error());
   t.is(result.code, 1);
 });
@@ -134,7 +142,28 @@ test('To current directory', t => {
   t.truthy(fs.existsSync('dest/testfile.txt'));
   t.truthy(fs.existsSync('dir1/insideDir.txt'));
   t.falsy(fs.existsSync('dest/insideDir.txt'));
-  shell.cd('..');
+});
+
+test('Inside existing directory', t => {
+  shell.cd(t.context.tmp);
+  const result = shell.ln('-s', 'external/node_script.js', './');
+  t.is(result.code, 0);
+  t.falsy(result.stderr);
+  t.falsy(shell.error());
+  t.truthy(fs.existsSync('node_script.js'));
+  t.is(
+    fs.readFileSync('external/node_script.js').toString(),
+    fs.readFileSync('node_script.js').toString()
+  );
+});
+
+test('Link to dead source links', t => {
+  shell.cd(t.context.tmp);
+  const result = shell.ln('-s', 'badlink', 'link-to-dead-link');
+  t.is(result.code, 0);
+  t.falsy(result.stderr);
+  t.falsy(shell.error());
+  fs.lstatSync('link-to-dead-link');
 });
 
 test('-f option', t => {
@@ -159,6 +188,18 @@ test('-sf option', t => {
     fs.writeFileSync(`${t.context.tmp}/file1.txt`, 'new content txt');
     t.is(fs.readFileSync(`${t.context.tmp}/file2.txt`).toString(), 'new content txt');
   });
+});
+
+test('Override dead destination links with -sf', t => {
+  shell.cd(t.context.tmp);
+  const result = shell.ln('-sf', 'file1.txt', 'badlink');
+  t.is(result.code, 0);
+  t.falsy(result.stderr);
+  t.falsy(shell.error());
+  t.is(
+    fs.readFileSync('file1.txt').toString(),
+    fs.readFileSync('badlink').toString()
+  );
 });
 
 test('Abspath regression', t => {
