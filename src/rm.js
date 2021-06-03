@@ -44,7 +44,12 @@ function rmdirSyncRecursive(dir, force, fromSymlink) {
 
   // if was directory was referenced through a symbolic link,
   // the contents should be removed, but not the directory itself
-  if (fromSymlink) return;
+  if (fromSymlink) {
+    if (!force) {
+      common.error("cannot remove '" + dir + "': Not a directory");
+    }
+    return;
+  }
 
   // Now that we know everything in the sub-tree has been deleted, we can delete the main directory.
   // Huzzah for the shopkeep.
