@@ -742,6 +742,11 @@ return value to be an error message. If you need the last error message, use
 the `.stderr` attribute from the last command's return value instead.
 
 
+### errorCode()
+
+Returns the error code from the last command.
+
+
 ### ShellString(str)
 
 Examples:

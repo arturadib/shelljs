@@ -40,6 +40,7 @@ test('it\'s ok to use no arguments', t => {
   const result = shell.ls();
   t.falsy(shell.error());
   t.is(result.code, 0);
+  t.is(shell.errorCode(), 0);
 });
 
 test('root directory', t => {

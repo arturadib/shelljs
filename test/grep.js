@@ -24,6 +24,7 @@ test('no args', t => {
   const result = shell.grep();
   t.truthy(shell.error());
   t.is(result.code, 2);
+  t.is(shell.errorCode(), 2);
 });
 
 test('too few args', t => {

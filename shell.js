@@ -34,6 +34,9 @@ exports.exit = process.exit;
 //@include ./src/error.js
 exports.error = require('./src/error');
 
+//@include ./src/errorCode.js
+exports.errorCode = require('./src/errorCode');
+
 //@include ./src/common.js
 exports.ShellString = common.ShellString;
 
